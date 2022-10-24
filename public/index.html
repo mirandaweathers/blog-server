@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>User API</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="/style.css">
+    </head>
+    <body>
+        <h1 id="api">User API</h1>
+        <p>
+            Jump to method:
+            <ul>
+                <li><a href="#get-users">GET /Users</a></li>
+                <li><a href="#post-users">POST /Users</a></li>
+                <li><a href="#get-user-id">GET /Users/{userId}</a></li>
+                <li><a href="#post-user-id">PATCH /Users/{userId}</a></li>
+                <li><a href="#delete-user-id">DELETE /Users/{userId}</a></li>
+            </ul>
+        </p>
+        
+        <h2 id="get-users">GET /Users</h2>
+        <p>
+            <strong>input:</strong> none
+        </p>
+        <p>
+            <strong>output:</strong> JSON array of users currently in memory, hiding passwords + <code>200 OK</code> status
+        </p>
+        <p>
+            <strong>error handling:</strong> if no users have been added, returns blank array
+        </p>
+        <p>
+            <small><a href="#">Jump to top</a></small>
+        </p>
+
+        <h2 id="post-users">POST /Users</h2>
+        <p>
+            <strong>input:</strong> JSON object for user with all the following attributes:
+            <br>
+            <ul class="JSON">
+                <li>{</li>
+                    <ul>
+                        <li>"userId": "string",</li>
+                        <li>"firstName": "string",</li>
+                        <li>"lastName": "string",</li>
+                        <li>"emailAddress": "string",</li>
+                        <li>"password": "string"</li>
+                    </ul>
+                <li>}</li>
+            </ul>
+        </p>
+        <p>
+            <strong>output:</strong> JSON object with new user's information, except for password + <code>201 Created</code> status
+            <br>
+            <ul class="JSON">
+                <li>{</li>
+                <ul>
+                    <li>"userId": "string",</li>
+                    <li>"firstName": "string",</li>
+                    <li>"lastName": "string",</li>
+                    <li>"emailAddress": "string"</li>
+                </ul>
+                <li>}</li>
+            </ul>
+        </p>
+        <p>
+            <strong>error handling:</strong>
+            <ul>
+                <li>if not all user fields present, <code>406 Unacceptable</code> status + message</li>
+                <li>if userId already exists, <code>409 Conflict</code> status + message</li>
+            </ul>
+        </p>
+        <p>
+            <small><a href="#">Jump to top</a></small>
+        </p>
+
+        <h2 id="get-user-id">GET /Users/{userId}</h2>
+        <p>
+            <strong>input:</strong> <code>userId</code>, given in URL
+        </p>
+        <p>
+            <strong>output:</strong> JSON object with user's information, except for password + <code>200 OK</code> status
+            <br>
+            <ul class="JSON">
+                <li>{</li>
+                <ul>
+                    <li>"userId": "string",</li>
+                    <li>"firstName": "string",</li>
+                    <li>"lastName": "string",</li>
+                    <li>"emailAddress": "string"</li>
+                </ul>
+                <li>}</li>
+            </ul>
+        </p>
+        <p>
+            <strong>error handling:</strong> if user not found, <code>404 Not Found</code> status + error message
+        </p>
+        <p>
+            <small><a href="#">Jump to top</a></small>
+        </p>
+
+        <h2 id="post-user-id">PATCH /Users/{userId}</h2>
+        <p>
+            <strong>input:</strong> <code>userId</code>, given in URL, plus JSON object for user with any or all of the following attributes:
+            <br>
+            <ul class="JSON">
+                <li>{</li>
+                    <ul>
+                        <li>"userId": "string",</li>
+                        <li>"firstName": "string",</li>
+                        <li>"lastName": "string",</li>
+                        <li>"emailAddress": "string",</li>
+                        <li>"password": "string"</li>
+                    </ul>
+                <li>}</li>
+            </ul>
+            *note: even if <code>userId</code> is changed within the request body, the new value will not be stored
+        </p>
+        <p>
+            <strong>output:</strong>
+            if user found, <code>200 OK</code> status + update and display updated user's information (password hidden) as JSON object:
+            <br>
+            <ul class="JSON">
+                <li>{</li>
+                    <ul>
+                        <li>"userId": "string",</li>
+                        <li>"firstName": "string",</li>
+                        <li>"lastName": "string",</li>
+                        <li>"emailAddress": "string"
+                    </ul>
+                <li>}</li>
+            </ul>
+        </p>
+        <p>
+            <strong>error handling:</strong> if user not found, <code>404 Not Found</code> status + error message
+        </p>
+        <p>
+            <small><a href="#">Jump to top</a></small>
+        </p>
+
+        <h2 id="delete-user-id">DELETE /Users/{userId}</h2>
+        <p>
+            <strong>input:</strong> <code>userId</code>, given in URL
+        </p>
+        <p>
+            <strong>output:</strong> user is removed from array in memory and <code>204 No Content</code> status
+        </p>
+        <p>
+            <strong>error handling:</strong> if user not found, <code>404 Not Found</code> status + error message
+        </p>
+        <p>
+            <small><a href="#">Jump to top</a></small>
+        </p>
+    </body>
+</html>
