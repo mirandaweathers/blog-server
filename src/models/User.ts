@@ -6,6 +6,7 @@ export class User {
     password:string = "";
 
     static VerifyUser(newUser:any) {
+        // check for valid email
         return newUser.userId && newUser.firstName && newUser.lastName && newUser.emailAddress && newUser.password;
     }
 
