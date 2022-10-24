@@ -1,6 +1,7 @@
 import { json } from 'body-parser';
 import express from 'express';
 import { User } from '../models/User';
+import jwt from 'jsonwebtoken';
 
 let userRouter = express.Router();
 
@@ -105,6 +106,24 @@ userRouter.delete('/:userId', (req, res, next) => {
         res.status(204).send();
     } else {
         res.status(404).send({message: 'Error: User Not Found'})
+    }
+});
+
+/**
+ * GET /Users/:userId/:password
+ * return valid JSON Web Token if username and password are valid
+ * return 401 Unauthroized otherwise
+ */
+userRouter.get('/:userId/:password', (req, res, next) => {
+    let userId = req.params.userId;
+    let user = userArray.find(u => u.userId == userId);
+
+    // verify username exists and password matches that associated w/given username
+    if(user && req.params.password == user.password) {
+        // generate JWT
+        res.send('Logged in! (fake)');
+    } else {
+        res.status(401).send({message: 'Error: Invalid Username/Password Combination'});
     }
 });
 
