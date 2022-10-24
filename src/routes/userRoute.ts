@@ -121,7 +121,10 @@ userRouter.get('/:userId/:password', (req, res, next) => {
     // verify username exists and password matches that associated w/given username
     if(user && req.params.password == user.password) {
         // generate JWT
-        res.send('Logged in! (fake)');
+        let token = jwt.sign({
+            data:'Authorized'
+        }, 'k3y$tr1n9');
+        res.send({token:token})
     } else {
         res.status(401).send({message: 'Error: Invalid Username/Password Combination'});
     }
