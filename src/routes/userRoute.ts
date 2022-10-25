@@ -13,20 +13,20 @@ let userArray:User[] = [];
  * if no users have been added, returns blank array
  */
 userRouter.get('/', (req, res, next) => {
-    try {
-        if(req.headers['authorization']) {
+    if(req.headers['authorization']) {
+        try {
             let authToken = jwt.verify(req.headers['authorization'].replace('Bearer ',''), 'k3y$tr1n9');
-    
+        
             if(authToken) {
                 res.status(200).send(userArray.map(user => User.PrintUser(user)));
             } else {
                 res.status(401).send({message:'Error - Unauthorized - Invalid Token'});
             }
-        } else {
-            res.status(401).send({message:'Error - Unauthorized - Invalid Token'});
-        }
-    } catch(e) {
-        console.log(e);
+        } catch(e) {
+        res.status(401).send({message:'Error - Unauthorized - Invalid Token'});
+        } 
+    } else {
+        res.status(401).send({message:'Error - Unauthorized - Invalid Token'});
     }
 });
 
