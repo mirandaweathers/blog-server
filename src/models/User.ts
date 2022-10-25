@@ -6,8 +6,9 @@ export class User {
     password:string = "";
 
     static VerifyUser(newUser:any) {
-        // check for valid email
-        return newUser.userId && newUser.firstName && newUser.lastName && newUser.emailAddress && newUser.password;
+        if(newUser.emailAddress != '' && /.+@.+\..+/.test(newUser.emailAddress) == true) {
+            return newUser.userId && newUser.firstName && newUser.lastName && newUser.emailAddress && newUser.password;
+        }
     }
 
     static PrintUser(user:User) {
