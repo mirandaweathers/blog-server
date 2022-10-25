@@ -8,6 +8,8 @@ let userRouter = express.Router();
 
 let userArray:User[] = [];
 
+const JWTKey = '8C99FE91F8977228693B5A2C3F1DB7F3E8AED4289D00C747AAA97B9E3167C20A';
+
 /**
  * GET /Users/
  * display JSON array of users currently in memory, hiding passwords
@@ -16,7 +18,7 @@ let userArray:User[] = [];
 userRouter.get('/', (req, res, next) => {
     if(req.headers['authorization']) {
         try {
-            let authToken = jwt.verify(req.headers['authorization'].replace('Bearer ',''), 'k3y$tr1n9');
+            let authToken = jwt.verify(req.headers['authorization'].replace('Bearer ',''), JWTKey);
         
             if(authToken) {
                 res.status(200).send(userArray.map(user => User.PrintUser(user)));
@@ -145,8 +147,14 @@ userRouter.get('/:userId/:password', (req, res, next) => {
             if(result == true) {
                 // generate JWT
                 let token = jwt.sign({
-                    data:'Authorized'
-                }, 'k3y$tr1n9');
+                    // one-hour token expiration
+                    exp: Math.floor((Date.now() / 1000) + (60*60)),
+                    // return authorized userId
+                    data: {
+                        authUserId: user?.userId,
+                        authName: user?.firstName
+                    }
+                }, JWTKey);
 
                 res.send({token:token});
             } else {
