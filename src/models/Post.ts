@@ -6,4 +6,12 @@ export class Post {
     userId:string = '';
     headerImage:string = '';
     lastUpdated:Date = new Date();
+
+    constructor(title:string, content:string, headerImage:string) {
+
+    }
+
+    static PrintPost(post:Post){
+
+    }
 }
