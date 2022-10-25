@@ -46,7 +46,7 @@ userRouter.post('/', (req, res, next) => {
         res.status(201).send(User.PrintUser(user));
     } else {
         switch(userExists) {
-            case true: res.status(409).send({message:'Error: Confnlict - userId already exists'});
+            case true: res.status(409).send({message:'Error: Conflict - userId already exists'});
                 break;
             default: res.status(406).send({message:'Error: Unacceptable - user information incomplete/invalid'});
         }
