@@ -13,7 +13,21 @@ let userArray:User[] = [];
  * if no users have been added, returns blank array
  */
 userRouter.get('/', (req, res, next) => {
-    res.status(200).send(userArray.map(user => User.PrintUser(user)));
+    try {
+        if(req.headers['authorization']) {
+            let authToken = jwt.verify(req.headers['authorization'].replace('Bearer ',''), 'k3y$tr1n9');
+    
+            if(authToken) {
+                res.status(200).send(userArray.map(user => User.PrintUser(user)));
+            } else {
+                res.status(401).send({message:'Error - Unauthorized - Invalid Token'});
+            }
+        } else {
+            res.status(401).send({message:'Error - Unauthorized - Invalid Token'});
+        }
+    } catch(e) {
+        console.log(e);
+    }
 });
 
 /**
@@ -124,7 +138,7 @@ userRouter.get('/:userId/:password', (req, res, next) => {
         let token = jwt.sign({
             data:'Authorized'
         }, 'k3y$tr1n9');
-        res.send({token:token})
+        res.send({token:token});
     } else {
         res.status(401).send({message: 'Error: Invalid Username/Password Combination'});
     }
