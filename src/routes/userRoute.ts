@@ -2,6 +2,7 @@ import { json } from 'body-parser';
 import express from 'express';
 import { User } from '../models/User';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 
 let userRouter = express.Router();
 
@@ -42,8 +43,13 @@ userRouter.post('/', (req, res, next) => {
     if(User.VerifyUser(req.body) && !userExists) {
         let user = new User();
         Object.assign(user,req.body);
-        userArray.push(user);
-        res.status(201).send(User.PrintUser(user));
+
+        // encrypt password
+        bcrypt.hash(user.password, 10, function(err, hash) {
+            user.password = hash;
+            userArray.push(user);
+            res.status(201).send(User.PrintUser(user));
+        });
     } else {
         switch(userExists) {
             case true: res.status(409).send({message:'Error: Conflict - userId already exists'});
@@ -131,14 +137,22 @@ userRouter.delete('/:userId', (req, res, next) => {
 userRouter.get('/:userId/:password', (req, res, next) => {
     let userId = req.params.userId;
     let user = userArray.find(u => u.userId == userId);
+    
+    // verify username exists
+    if(user) {
+        // compare given pw with stored encrypted pw
+        bcrypt.compare(req.params.password, user.password, function(err, result) {
+            if(result == true) {
+                // generate JWT
+                let token = jwt.sign({
+                    data:'Authorized'
+                }, 'k3y$tr1n9');
 
-    // verify username exists and password matches that associated w/given username
-    if(user && req.params.password == user.password) {
-        // generate JWT
-        let token = jwt.sign({
-            data:'Authorized'
-        }, 'k3y$tr1n9');
-        res.send({token:token});
+                res.send({token:token});
+            } else {
+                res.status(401).send({message: 'Error: Invalid Username/Password Combination'});
+            }
+        });
     } else {
         res.status(401).send({message: 'Error: Invalid Username/Password Combination'});
     }
