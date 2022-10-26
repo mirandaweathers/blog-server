@@ -43,7 +43,6 @@ authRouter.use('/', (req, res, next) => {
     ];
 
     let cont = true;
-    let regex = '^/[^/]+/[^/]+[a-zA-Z0-9]$';
 
     for (let route of routes) {
         if (req.url.includes(route.url) && req.method == route.method) {
