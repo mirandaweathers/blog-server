@@ -129,7 +129,7 @@ postRouter.get('/:postId', (req, res, next) => {
             postArray.splice(postArray.indexOf(post), 1);
             res.status(204).send();
         } else {
-            res.status(401).send({status: '401', message: 'Error - Unauthorized to delete this post'})
+            res.status(401).send({status: '401', message: 'Error - Unauthorized to delete this post'});
         }
     } else {
         res.status(404).send({status: '404', message: 'Error - Post Not Found'})
@@ -151,4 +151,4 @@ postRouter.get('/:postId', (req, res, next) => {
     }
 });
 
-export { postRouter };
+export { postRouter, postArray };
