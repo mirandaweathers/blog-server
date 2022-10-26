@@ -3,12 +3,13 @@ import express from 'express';
 import { User } from '../models/User';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import dotenv from 'dotenv';
+dotenv.config();
+const key = process.env.JWTKEY!.toString();
 
 let userRouter = express.Router();
 
 let userArray:User[] = [];
-
-const JWTKey = '8C99FE91F8977228693B5A2C3F1DB7F3E8AED4289D00C747AAA97B9E3167C20A';
 
 /**
  * GET /Users/
@@ -18,7 +19,7 @@ const JWTKey = '8C99FE91F8977228693B5A2C3F1DB7F3E8AED4289D00C747AAA97B9E3167C20A
 userRouter.get('/', (req, res, next) => {
     if(req.headers['authorization']) {
         try {
-            let authToken = jwt.verify(req.headers['authorization'].replace('Bearer ',''), JWTKey);
+            let authToken = jwt.verify(req.headers['authorization'].replace('Bearer ',''), key);
         
             if(authToken) {
                 res.status(200).send(userArray.map(user => User.PrintUser(user)));
@@ -70,7 +71,7 @@ userRouter.post('/', (req, res, next) => {
 userRouter.get('/:userId', (req, res, next) => {
     if(req.headers['authorization']) {
         try {
-            let authToken = jwt.verify(req.headers['authorization'].replace('Bearer ',''), JWTKey);
+            let authToken = jwt.verify(req.headers['authorization'].replace('Bearer ',''), key);
             let decode = jwt.decode(req.headers['authorization'].replace('Bearer ',''));
             // console.log(decode.data.authUserId);
             
@@ -109,7 +110,7 @@ userRouter.get('/:userId', (req, res, next) => {
 userRouter.patch('/:userId', (req, res, next) => {
     if(req.headers['authorization']) {
         try {
-            let authToken = jwt.verify(req.headers['authorization'].replace('Bearer ',''), JWTKey);
+            let authToken = jwt.verify(req.headers['authorization'].replace('Bearer ',''), key);
         
             if(authToken) {
                 let userId = req.params.userId;
@@ -154,7 +155,7 @@ userRouter.delete('/:userId', (req, res, next) => {
     
     if(req.headers['authorization']) {
         try {
-            let authToken = jwt.verify(req.headers['authorization'].replace('Bearer ',''), JWTKey);
+            let authToken = jwt.verify(req.headers['authorization'].replace('Bearer ',''), key);
         
             if(authToken) {
                 let userId = req.params.userId;
@@ -200,7 +201,7 @@ userRouter.get('/:userId/:password', (req, res, next) => {
                         authUserId: user?.userId,
                         authName: user?.firstName
                     }
-                }, JWTKey);
+                }, key);
 
                 res.send({token:token});
             } else {
