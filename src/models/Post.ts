@@ -8,16 +8,6 @@ export class Post {
     headerImage:string = '';
     lastUpdated:Date = new Date();
 
-    // constructor(title:string, content:string, headerImage?:string) {
-    //     this.postId = Post.id++;
-    //     this.createdDate = new Date();
-    //     this.title = title;
-    //     this.content = content;
-    //     this.userId = '';
-    //     if(headerImage) this.headerImage = headerImage;
-    //     this.lastUpdated = new Date();
-    // }
-
     static VerifyPost(newPost:any) {
         if(newPost.title != '' && newPost.content != '') {
             return newPost.title && newPost.content;
