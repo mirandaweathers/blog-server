@@ -41,9 +41,9 @@ userRouter.post('/', (req, res, next) => {
         });
     } else {
         switch(userExists) {
-            case true: res.status(409).send({message:'Error: Conflict - userId already exists'});
+            case true: res.status(409).send({status: '409', message:'Error: Conflict - userId already exists'});
                 break;
-            default: res.status(406).send({message:'Error: Unacceptable - user information incomplete/invalid'});
+            default: res.status(406).send({status: '406', message:'Error: Unacceptable - user information incomplete/invalid'});
         }
     }
 });
@@ -64,7 +64,7 @@ userRouter.get('/:userId', (req, res, next) => {
             lastName:user.lastName, 
             emailAddress:user.emailAddress});
     } else {
-        res.status(404).send({message: 'Error: User Not Found'})
+        res.status(404).send({status: '404', message: 'Error: User Not Found'})
     }
 });
 
@@ -96,7 +96,7 @@ userRouter.patch('/:userId', (req, res, next) => {
             lastName:user.lastName, 
             emailAddress:user.emailAddress});
     } else {
-        res.status(404).send({message: 'Error: User Not Found'})
+        res.status(404).send({status: '404', message: 'Error: User Not Found'})
     }
 });
 
@@ -114,7 +114,7 @@ userRouter.delete('/:userId', (req, res, next) => {
         userArray.splice(userArray.indexOf(user), 1);
         res.status(204).send();
     } else {
-        res.status(404).send({message: 'Error: User Not Found'})
+        res.status(404).send({status: '404', message: 'Error: User Not Found'})
     }
 });
 
@@ -145,11 +145,11 @@ userRouter.get('/:userId/:password', (req, res, next) => {
 
                 res.send({token:token});
             } else {
-                res.status(401).send({message: 'Error: Invalid Username/Password Combination'});
+                res.status(401).send({status: '401', message: 'Error: Invalid Username/Password Combination'});
             }
         });
     } else {
-        res.status(401).send({message: 'Error: Invalid Username/Password Combination'});
+        res.status(401).send({status: '401', message: 'Error: Invalid Username/Password Combination'});
     }
 });
 

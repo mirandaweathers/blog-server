@@ -76,7 +76,7 @@ authRouter.use('/', (req, res, next) => {
        next();
     else
     {
-        res.status(401).send({message:'401 - Unauthorized'});
+        res.status(401).send({status: '401', message:'Unauthorized - Invalid Token'});
     }
     
 });
