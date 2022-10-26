@@ -17,21 +17,7 @@ let userArray:User[] = [];
  * if no users have been added, returns blank array
  */
 userRouter.get('/', (req, res, next) => {
-    if(req.headers['authorization']) {
-        try {
-            let authToken = jwt.verify(req.headers['authorization'].replace('Bearer ',''), key);
-        
-            if(authToken) {
-                res.status(200).send(userArray.map(user => User.PrintUser(user)));
-            } else {
-                res.status(401).send({message:'Error - Unauthorized - Invalid Token'});
-            }
-        } catch(e) {
-        res.status(401).send({message:'Error - Unauthorized - Invalid Token'});
-        } 
-    } else {
-        res.status(401).send({message:'Error - Unauthorized - Invalid Token'});
-    }
+    res.status(200).send(userArray.map(user => User.PrintUser(user)));
 });
 
 /**
@@ -69,33 +55,16 @@ userRouter.post('/', (req, res, next) => {
  * if not found, return 404 status + error message
  */
 userRouter.get('/:userId', (req, res, next) => {
-    if(req.headers['authorization']) {
-        try {
-            let authToken = jwt.verify(req.headers['authorization'].replace('Bearer ',''), key);
-            let decode = jwt.decode(req.headers['authorization'].replace('Bearer ',''));
-            // console.log(decode.data.authUserId);
-            
-        
-            if(authToken) {
-                let userId = req.params.userId;
-                let user = userArray.find(u => u.userId == userId);
-                if(user) {
-                    res.status(200).send({
-                        userId:user.userId, 
-                        firstName:user.firstName, 
-                        lastName:user.lastName, 
-                        emailAddress:user.emailAddress});
-                } else {
-                    res.status(404).send({message: 'Error: User Not Found'})
-                }
-            } else {
-                res.status(401).send({message:'Error - Unauthorized - Invalid Token'});
-            }
-        } catch(e) {
-        res.status(401).send({message:'Error - Unauthorized - Invalid Token'});
-        } 
+    let userId = req.params.userId;
+    let user = userArray.find(u => u.userId == userId);
+    if(user) {
+        res.status(200).send({
+            userId:user.userId, 
+            firstName:user.firstName, 
+            lastName:user.lastName, 
+            emailAddress:user.emailAddress});
     } else {
-        res.status(401).send({message:'Error - Unauthorized - Invalid Token'});
+        res.status(404).send({message: 'Error: User Not Found'})
     }
 });
 
@@ -108,40 +77,26 @@ userRouter.get('/:userId', (req, res, next) => {
  * plus updated user fields
  */
 userRouter.patch('/:userId', (req, res, next) => {
-    if(req.headers['authorization']) {
-        try {
-            let authToken = jwt.verify(req.headers['authorization'].replace('Bearer ',''), key);
-        
-            if(authToken) {
-                let userId = req.params.userId;
-                let user = userArray.find(u => u.userId == userId);
+    let userId = req.params.userId;
+    let user = userArray.find(u => u.userId == userId);
 
-                if(user) {
-                    if(req.body.firstName)
-                        user.firstName = req.body.firstName;
-                    if(req.body.lastName)
-                        user.lastName = req.body.lastName;
-                    if(req.body.emailAddress)
-                        user.emailAddress = req.body.emailAddress;
-                    if(req.body.password)
-                        user.password = req.body.password;
+    if(user) {
+        if(req.body.firstName)
+            user.firstName = req.body.firstName;
+        if(req.body.lastName)
+            user.lastName = req.body.lastName;
+        if(req.body.emailAddress)
+            user.emailAddress = req.body.emailAddress;
+        if(req.body.password)
+            user.password = req.body.password;
 
-                    res.status(200).send({
-                        userId:user.userId, 
-                        firstName:user.firstName, 
-                        lastName:user.lastName, 
-                        emailAddress:user.emailAddress});
-                } else {
-                    res.status(404).send({message: 'Error: User Not Found'})
-                }
-            } else {
-                res.status(401).send({message:'Error - Unauthorized - Invalid Token'});
-            }
-        } catch(e) {
-        res.status(401).send({message:'Error - Unauthorized - Invalid Token'});
-        } 
+        res.status(200).send({
+            userId:user.userId, 
+            firstName:user.firstName, 
+            lastName:user.lastName, 
+            emailAddress:user.emailAddress});
     } else {
-        res.status(401).send({message:'Error - Unauthorized - Invalid Token'});
+        res.status(404).send({message: 'Error: User Not Found'})
     }
 });
 
@@ -152,29 +107,14 @@ userRouter.patch('/:userId', (req, res, next) => {
  * if user doesn't exist, respond with 404 status + error message
  */
 userRouter.delete('/:userId', (req, res, next) => {
-    
-    if(req.headers['authorization']) {
-        try {
-            let authToken = jwt.verify(req.headers['authorization'].replace('Bearer ',''), key);
-        
-            if(authToken) {
-                let userId = req.params.userId;
-                let user = userArray.find(u => u.userId == userId);
+    let userId = req.params.userId;
+    let user = userArray.find(u => u.userId == userId);
 
-                if(user) {
-                    userArray.splice(userArray.indexOf(user), 1);
-                    res.status(204).send();
-                } else {
-                    res.status(404).send({message: 'Error: User Not Found'})
-                }
-            } else {
-                res.status(401).send({message:'Error - Unauthorized - Invalid Token'});
-            }
-        } catch(e) {
-        res.status(401).send({message:'Error - Unauthorized - Invalid Token'});
-        } 
+    if(user) {
+        userArray.splice(userArray.indexOf(user), 1);
+        res.status(204).send();
     } else {
-        res.status(401).send({message:'Error - Unauthorized - Invalid Token'});
+        res.status(404).send({message: 'Error: User Not Found'})
     }
 });
 

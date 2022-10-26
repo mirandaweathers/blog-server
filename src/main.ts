@@ -1,6 +1,8 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import { userRouter } from './routes/userRoute';
+import { postRouter } from './routes/postRoute';
+import { authRouter } from './middleware/authorize';
 
 const path = require('path');
 
@@ -9,7 +11,9 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use('/', authRouter);
 app.use('/Users', userRouter);
+app.use('/Posts', postRouter);
 app.use(express.static('public'));
 
 app.get('/', (req, res, next) => {
