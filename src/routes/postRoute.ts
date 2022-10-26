@@ -61,7 +61,7 @@ postRouter.post('/', (req, res, next) => {
 
         res.status(201).send(post)
     } else {
-        res.status(400).send({message: 'error'})
+        res.status(406).send({status: '406', message: 'Error - Missing post title or content'})
     }
 });
 
@@ -69,28 +69,86 @@ postRouter.post('/', (req, res, next) => {
  * GET /Posts/:postId
  */
 postRouter.get('/:postId', (req, res, next) => {
-
+    let postId = parseInt(req.params.postId);
+    let post = postArray.find(p => p.postId == postId);
+    if(post) {
+        res.status(200).send(post);
+    } else {
+        res.status(404).send({status: '404', message: 'Error - Post Not Found'})
+    }
 });
 
 /**
  * PATCH /Posts/:postId
  */
  postRouter.patch('/:postId', (req, res, next) => {
+    // verify if post exists
+    let postId = parseInt(req.params.postId);
+    let post = postArray.find(p => p.postId == postId);
 
+    if(post) {
+        // verify if userId's match
+        let postUserId = post?.userId;
+        let jwtObject = parseJWT(req.headers['authorization']!.replace('Bearer ', ''));
+        let currUserId = jwtObject.data.authUserId;
+
+        // if match, update post; if no match, 401 Unauthorized
+        if (postUserId == currUserId) {
+            if(req.body.title)
+                post.title = req.body.title;
+            if(req.body.content)
+                post.content = req.body.content;
+            if(req.body.headerImage)
+                post.headerImage = req.body.headerImage;
+
+            res.status(200).send(post);
+        } else {
+            res.status(401).send({status: '401', message: 'Error - Unauthorized to edit this post'})
+        }
+    } else {
+        res.status(404).send({status: '404', message: 'Error - Post Not Found'})
+    }
 });
 
 /**
  * DELETE /Posts/:postId
  */
  postRouter.delete('/:postId', (req, res, next) => {
+    // verify if post exists
+    let postId = parseInt(req.params.postId);
+    let post = postArray.find(p => p.postId == postId);
 
+    if(post) {
+        // verify if userId's match
+        let postUserId = post?.userId;
+        let jwtObject = parseJWT(req.headers['authorization']!.replace('Bearer ', ''));
+        let currUserId = jwtObject.data.authUserId;
+
+        // if match, delete post; if no match, 401 Unauthorized
+        if (postUserId == currUserId) {
+            postArray.splice(postArray.indexOf(post), 1);
+            res.status(204).send();
+        } else {
+            res.status(401).send({status: '401', message: 'Error - Unauthorized to delete this post'})
+        }
+    } else {
+        res.status(404).send({status: '404', message: 'Error - Post Not Found'})
+    }
 });
 
 /**
  * GET /Posts/User/:userId
+ * return list of all posts by given userId, most recent first
+ * if none found, status 404 No Posts Found
  */
  postRouter.get('/User/:userId', (req, res, next) => {
-
+    let postUserId = req.params.userId;
+    let posts = postArray.filter(p => p.userId == postUserId);
+    if(posts.length > 0) {
+        res.status(200).send(posts.sort((a,b) => b.lastUpdated.getTime() - a.lastUpdated.getTime()));
+    } else {
+        res.status(404).send({status: '404', message: 'No Posts Found'})
+    }
 });
 
 export { postRouter };
