@@ -11,19 +11,26 @@ let postRouter = express.Router();
 
 let postArray:Post[] = [];
 
-// function parseJWT(token:string|JwtPayload) {
-//     var baseUrl = token.split(',')[1];
-//     var base = decodeURIComponent(atob(baseUrl).split('').map((c) =>{
-//         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-//     }).join(''));
-//     return base;
-// }
+/**
+ * take in JWT and return decoded JWT json object
+ */
+function parseJWT(token:any) {
+    var base64Url = token.split('.')[1];
+    var base64 = decodeURIComponent(atob(base64Url).split('').map((c) =>{
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(base64);
+}
 
 /**
  * GET /Posts
  * most recent first
  */
 postRouter.get('/', (req, res, next) => {
+    // sort posts in descending order based on time last updated (most recent first)
+    postArray.sort((a,b) => b.lastUpdated.getTime() - a.lastUpdated.getTime());
+
+    // return list of sorted posts in postArray
     res.status(200).send(postArray.map(post => Post.PrintPost(post)));
 });
 
@@ -31,56 +38,31 @@ postRouter.get('/', (req, res, next) => {
  * POST /Posts
  */
 postRouter.post('/', (req, res, next) => {
+    // get userId from JWT token
+    let jwtObject = parseJWT(req.headers['authorization']!.replace('Bearer ', ''));
+    // console.log(jwtObject);
+    let userId = jwtObject.data.authUserId;
+    // console.log(userId);
+
     if(Post.VerifyPost(req.body)) {
         let post = new Post();
+        
         post = {
             postId: Post.id++,
             createdDate: new Date(),
             title: req.body.title,
             content: req.body.content,
-            userId: 'idk yet',
+            userId: userId,
             headerImage: req.body.headerImage ?? '',
             lastUpdated: new Date()
         }
-        res.status(201).send({message: 'post created'})
+
+        postArray.push(post);
+
+        res.status(201).send(post)
     } else {
         res.status(400).send({message: 'error'})
     }
-
-    // // check for authorization header
-    // if(req.headers['authorization']) {
-    //     try {
-    //         let authToken = jwt.verify(req.headers['authorization'].replace('Bearer ',''), key);
-        
-    //         // validate token
-    //         if(authToken) {
-    //             // get userId from authToken
-    //             let userId = parseJWT(authToken);
-    //             console.log(userId);
-
-    //             // create new post with title, content, and optional headerImage
-    //             if(Post.VerifyPost(req.body)) {
-    //                 let post = new Post();
-    //                 post = {
-    //                     postId: Post.id++,
-    //                     createdDate: new Date(),
-    //                     title: req.body.title,
-    //                     content: req.body.content,
-    //                     userId: userId,
-    //                     headerImage: req.body.headerImage ?? '',
-    //                     lastUpdated: new Date()
-    //                 }
-    //             }
-    //             // if missing title or content, 406 Unacceptable
-    //         } else {
-    //             res.status(401).send({message:'Error - Unauthorized - Invalid Token'});
-    //         }
-    //     } catch(e) {
-    //     res.status(401).send({message:'Error - Unauthorized - Invalid Token'});
-    //     } 
-    // } else {
-    //     res.status(401).send({message:'Error - Unauthorized - Invalid Token'});
-    // }
 });
 
 /**
