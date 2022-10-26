@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import { userRouter } from './routes/userRoute';
 import { postRouter } from './routes/postRoute';
 import { authRouter } from './middleware/authorize';
+import { commentRouter } from './routes/commentRoute';
 
 const path = require('path');
 
@@ -14,6 +15,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/', authRouter);
 app.use('/Users', userRouter);
 app.use('/Posts', postRouter);
+app.use('/Comments', commentRouter);
 app.use(express.static('public'));
 
 app.get('/', (req, res, next) => {
