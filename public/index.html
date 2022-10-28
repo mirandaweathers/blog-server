@@ -3,7 +3,7 @@
     <head>
         <title>User API</title>
         <meta charset="utf-8">
-        <link rel="stylesheet" href="/style.css">
+        <link rel="stylesheet" href="./style.css">
     </head>
     <body>
         <h1 id="api">User API</h1>
@@ -15,10 +15,20 @@
                 <li><a href="#get-user-id">GET /Users/{userId}</a></li>
                 <li><a href="#post-user-id">PATCH /Users/{userId}</a></li>
                 <li><a href="#delete-user-id">DELETE /Users/{userId}</a></li>
+                <li><a href="#get-user-pw">GET /Users/{userId}/{password}</a></li>
+                <li><a href="#get-posts">GET /Posts</a></li>
+                <li><a href="#post-posts">POST /Posts</a></li>
+                <li><a href="#get-post-id">GET /Posts/{postId}</a></li>
+                <li><a href="#patch-post-id">PATCH /Posts/{postId}</a></li>
+                <li><a href="#delete-post-id">DELETE /Posts/{postId}</a></li>
+                <li><a href="#get-post-user">GET /Posts/User/{userId}</a></li>
+                <li><a href="#get-comments">GET Comments/{postId}</a></li>
+                <li><a href="#post-comments">POST Comments/{postId}</a></li>
+                <li><a href="#delete-comments">DELETE Comments/{postId}/{commentId}</a></li>
             </ul>
         </p>
         
-        <h2 id="get-users">GET /Users</h2>
+        <h2 id="get-users">GET /Users 🔒</h2>
         <p>
             <strong>input:</strong> none
         </p>
@@ -26,7 +36,10 @@
             <strong>output:</strong> JSON array of users currently in memory, hiding passwords + <code>200 OK</code> status
         </p>
         <p>
-            <strong>error handling:</strong> if no users have been added, returns blank array
+            <strong>error handling:</strong> 
+            <ul>
+                <li><code>401 Unauthorized</code> - Access token missing/invalid</li>
+            </ul>
         </p>
         <p>
             <small><a href="#">Jump to top</a></small>
@@ -65,15 +78,15 @@
         <p>
             <strong>error handling:</strong>
             <ul>
-                <li>if not all user fields present, <code>406 Unacceptable</code> status + message</li>
-                <li>if userId already exists, <code>409 Conflict</code> status + message</li>
+                <li><code>406 Unacceptable</code> - not all user fields present or invalid email address</li>
+                <li><code>409 Conflict</code> - userId already exists</li>
             </ul>
         </p>
         <p>
             <small><a href="#">Jump to top</a></small>
         </p>
 
-        <h2 id="get-user-id">GET /Users/{userId}</h2>
+        <h2 id="get-user-id">GET /Users/{userId} 🔒</h2>
         <p>
             <strong>input:</strong> <code>userId</code>, given in URL
         </p>
@@ -92,13 +105,17 @@
             </ul>
         </p>
         <p>
-            <strong>error handling:</strong> if user not found, <code>404 Not Found</code> status + error message
+            <strong>error handling:</strong> 
+            <ul>
+                <li><code>401 Unauthorized</code> - Access token missing/invalid</li>
+                <li><code>404 Not Found</code> - User not found</li>
+            </ul>
         </p>
         <p>
             <small><a href="#">Jump to top</a></small>
         </p>
 
-        <h2 id="post-user-id">PATCH /Users/{userId}</h2>
+        <h2 id="post-user-id">PATCH /Users/{userId} 🔒</h2>
         <p>
             <strong>input:</strong> <code>userId</code>, given in URL, plus JSON object for user with any or all of the following attributes:
             <br>
@@ -125,19 +142,24 @@
                         <li>"userId": "string",</li>
                         <li>"firstName": "string",</li>
                         <li>"lastName": "string",</li>
-                        <li>"emailAddress": "string"
+                        <li>"emailAddress": "user@example.com"
                     </ul>
                 <li>}</li>
             </ul>
         </p>
         <p>
-            <strong>error handling:</strong> if user not found, <code>404 Not Found</code> status + error message
+            <strong>error handling:</strong> 
+            <ul>
+                <li><code>401 Unauthorized</code> - Access token missing/invalid</li>
+                <li><code>404 Not Found</code> - User not found</li>
+                <li><code>406 Unacceptable</code> - Bad data, ex: invalid email address</li>
+            </ul>
         </p>
         <p>
             <small><a href="#">Jump to top</a></small>
         </p>
 
-        <h2 id="delete-user-id">DELETE /Users/{userId}</h2>
+        <h2 id="delete-user-id">DELETE /Users/{userId} 🔒</h2>
         <p>
             <strong>input:</strong> <code>userId</code>, given in URL
         </p>
@@ -145,7 +167,288 @@
             <strong>output:</strong> user is removed from array in memory and <code>204 No Content</code> status
         </p>
         <p>
-            <strong>error handling:</strong> if user not found, <code>404 Not Found</code> status + error message
+            <strong>error handling:</strong> 
+            <ul>
+                <li><code>401 Unauthorized</code> - Access token missing/invalid</li>
+                <li><code>404 Not Found</code> - User not found</li>
+            </ul>
+        </p>
+        <p>
+            <small><a href="#">Jump to top</a></small>
+        </p>
+
+        <h2 id="get-user-pw">GET /Users/{userId}/{password}</h2>
+        <p>
+            <strong>input:</strong> <code>userId</code> and <code>password</code>, URL parameters
+        </p>
+        <p>
+            <strong>output:</strong>  <code>200 OK</code> status + Authenticates a user
+             and returns a valid JSON Web Token
+             <ul class="JSON">
+                <li>{</li>
+                <ul>
+                    <li>"token": "string"</li>
+                </ul>
+                <li>}</li>
+            </ul>
+        </p>
+        <p>
+            <strong>error handling:</strong> <code>401 Unauthorized</code> - Bad username/password combination
+        </p>
+        <p>
+            <small><a href="#">Jump to top</a></small>
+        </p>
+
+        <h2 id="get-posts">GET /Posts</h2>
+        <p>
+            <strong>input:</strong> none
+        </p>
+        <p>
+            <strong>output:</strong> <code>200 OK</code> status + array of available posts 
+            sorted chronologically with most recent post first:
+            <ul class="JSON">
+                <li>{</li>
+                <ul>
+                    <li>"postId": 0,</li>
+                    <li>"createdDate": "2022-10-28",</li>
+                    <li>"title": "string",</li>
+                    <li>"content": "string",</li>
+                    <li>"userId": "string",</li>
+                    <li>"headerImage": "string",</li>
+                    <li>"lastUpdated": "2022-10-28"</li>
+                </ul>
+                <li>}</li>
+            </ul>
+        </p>
+        <p>
+            <strong>error handling:</strong> n/a
+        </p>
+        <p>
+            <small><a href="#">Jump to top</a></small>
+        </p>
+
+        <h2 id="post-posts">POST /Posts 🔒</h2>
+        <p>
+            <strong>input:</strong> request body:
+            <ul class="JSON">
+                <li>{</li>
+                <ul>
+                    <li>"title": "string",</li>
+                    <li>"content": "string",</li>
+                    <li>"headerImage": "string"</li>
+                </ul>
+                <li>}</li>
+            </ul>
+        </p>
+        <p>
+            <strong>output:</strong>  <code>201 Created</code> status + post info:
+            <ul class="JSON">
+                <li>{</li>
+                <ul>
+                    <li>"postId": 0,</li>
+                    <li>"createdDate": "2022-10-28",</li>
+                    <li>"title": "string",</li>
+                    <li>"content": "string",</li>
+                    <li>"userId": "string",</li>
+                    <li>"headerImage": "string",</li>
+                    <li>"lastUpdated": "2022-10-28"</li>
+                </ul>
+                <li>}</li>
+            </ul>
+        </p>
+        <p>
+            <strong>error handling:</strong>
+            <ul>
+                <li><code>401 Unauthorized</code> - Access token missing/invalid</li>
+                <li><code>406 Unacceptable</code> - Missing title/content</li>
+            </ul>
+        </p>
+        <p>
+            <small><a href="#">Jump to top</a></small>
+        </p>
+
+        <h2 id="get-post-id">GET /Posts/{postId}</h2>
+        <p>
+            <strong>input:</strong> <code>postId</code>, URL parameter
+        </p>
+        <p>
+            <strong>output:</strong> <code>200 OK</code> status + post info:
+            <ul class="JSON">
+                <li>{</li>
+                <ul>
+                    <li>"postId": 0,</li>
+                    <li>"createdDate": "2022-10-28",</li>
+                    <li>"title": "string",</li>
+                    <li>"content": "string",</li>
+                    <li>"userId": "string",</li>
+                    <li>"headerImage": "string",</li>
+                    <li>"lastUpdated": "2022-10-28"</li>
+                </ul>
+                <li>}</li>
+            </ul>
+        </p>
+        <p>
+            <strong>error handling:</strong> <code>404 Not Found</code> - No posts found
+        </p>
+        <p>
+            <small><a href="#">Jump to top</a></small>
+        </p>
+
+        <h2 id="patch-post-id">PATCH /Posts/{postId} 🔒</h2>
+        <p>
+            <strong>input:</strong> <code>postId</code>, URL parameter + request body:
+            <ul class="JSON">
+                <li>{</li>
+                <ul>
+                    <li>"title": "string",</li>
+                    <li>"content": "string",</li>
+                    <li>"headerImage": "string"</li>
+                </ul>
+                <li>}</li>
+            </ul>
+        </p>
+        <p>
+            <strong>output:</strong>  <code>200 OK</code> status - Post updated + post info:
+            <ul class="JSON">
+                <li>{</li>
+                <ul>
+                    <li>"postId": 0,</li>
+                    <li>"createdDate": "2022-10-28",</li>
+                    <li>"title": "string",</li>
+                    <li>"content": "string",</li>
+                    <li>"userId": "string",</li>
+                    <li>"headerImage": "string",</li>
+                    <li>"lastUpdated": "2022-10-28"</li>
+                </ul>
+                <li>}</li>
+            </ul>
+        </p>
+        <p>
+            <strong>error handling:</strong>
+            <ul>
+                <li><code>401 Unauthorized</code> - Access token missing/invalid</li>
+                <li><code>404 Not Found</code> - Post not found</li>
+            </ul>
+        </p>
+        <p>
+            <small><a href="#">Jump to top</a></small>
+        </p>
+
+        <h2 id="delete-post-id">DELETE /Posts/{postId} 🔒</h2>
+        <p>
+            <strong>input:</strong> <code>postId</code>, URL parameter
+        </p>
+        <p>
+            <strong>output:</strong> <code>204 Content Removed</code> status
+        </p>
+        <p>
+            <strong>error handling:</strong>
+            <ul>
+                <li><code>401 Unauthorized</code> - Access token missing/invalid</li>
+                <li><code>404 Not Found</code> - Post not found</li>
+            </ul>
+        </p>
+        <p>
+            <small><a href="#">Jump to top</a></small>
+        </p>
+
+        <h2 id="get-post-user">GET /Posts/User/{userId}</h2>
+        <p>
+            <strong>input:</strong> <code>postId</code>, URL parameter
+        </p>
+        <p>
+            <strong>output:</strong>  <code>200 OK</code> status + array of available 
+            posts sorted chronologically with most recent post first for the given user
+            <ul class="JSON">
+                <li>{</li>
+                <ul>
+                    <li>"postId": 0,</li>
+                    <li>"createdDate": "2022-10-28",</li>
+                    <li>"title": "string",</li>
+                    <li>"content": "string",</li>
+                    <li>"userId": "string",</li>
+                    <li>"headerImage": "string",</li>
+                    <li>"lastUpdated": "2022-10-28"</li>
+                </ul>
+                <li>}</li>
+            </ul>
+        </p>
+        <p>
+            <strong>error handling:</strong> <code>404 Not Found</code> - Invalid user / no posts found
+        </p>
+        <p>
+            <small><a href="#">Jump to top</a></small>
+        </p>
+
+        <h2 id="get-comments">GET /Comments/{postId}</h2>
+        <p>
+            <strong>input:</strong> <code>postId</code>, URL parameter
+        </p>
+        <p>
+            <strong>output:</strong>  <code>200 OK</code> status + list of all comments 
+            related to a post in chronological order with most recent comment first; 
+            empty array if no comments for post
+            <ul class="JSON">
+                <li>{</li>
+                <ul>
+                    <li>"commentId": 0,</li>
+                    <li>"comment": "string",</li>
+                    <li>"userId": "string",</li>
+                    <li>"postId": 0,</li>
+                    <li>"commentDate": "2022-10-28"</li>
+                </ul>
+                <li>}</li>
+            </ul>
+        </p>
+        <p>
+            <strong>error handling:</strong> n/a
+        </p>
+        <p>
+            <small><a href="#">Jump to top</a></small>
+        </p>
+
+        <h2 id="post-comments">POST /Comments/{postId} 🔒</h2>
+        <p>
+            <strong>input:</strong> <code>postId</code>, URL parameter
+        </p>
+        <p>
+            <strong>output:</strong> <code>201 Created</code> status + comment body:
+            <ul class="JSON">
+                <li>{</li>
+                <ul>
+                    <li>"commentId": 0,</li>
+                    <li>"comment": "string",</li>
+                    <li>"userId": "string",</li>
+                    <li>"postId": 0,</li>
+                    <li>"commentDate": "2022-10-28"</li>
+                </ul>
+                <li>}</li>
+            </ul>
+        </p>
+        <p>
+            <strong>error handling:</strong>
+            <ul>
+                <li><code>401 Unauthorized</code> - Access token missing/invalid</li>
+                <li><code>404 Not Found</code> - Post not found</li>
+            </ul>
+        </p>
+        <p>
+            <small><a href="#">Jump to top</a></small>
+        </p>
+
+        <h2 id="delete-comments">DELETE /Comments/{postId}/{commentId} 🔒</h2>
+        <p>
+            <strong>input:</strong> <code>postId</code> and <code>commentId</code>, URL parameter
+        </p>
+        <p>
+            <strong>output:</strong> <code>204 Removed</code> status
+        </p>
+        <p>
+            <strong>error handling:</strong>
+            <ul>
+                <li><code>401 Unauthorized</code> - Access token missing/invalid</li>
+                <li><code>404 Not Found</code> - Comment or post not found</li>
+            </ul>
         </p>
         <p>
             <small><a href="#">Jump to top</a></small>
