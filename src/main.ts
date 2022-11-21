@@ -4,10 +4,16 @@ import { userRouter } from './routes/userRoute';
 import { postRouter } from './routes/postRoute';
 import { authRouter } from './middleware/authorize';
 import { commentRouter } from './routes/commentRoute';
+import cors from 'cors';
 
 const path = require('path');
 
 const app = express();
+
+app.use(cors({
+    origin: '*',
+    credentials: true
+}));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
